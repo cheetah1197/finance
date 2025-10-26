@@ -3,7 +3,8 @@ from fastapi import FastAPI
 from app.routers import tariffs, economics
 from app.core.config import settings
 
-app = FastAPI(title=settings.PROJECT_NAME)
+# Use a hardcoded title for now
+app = FastAPI(title="Tariffs & Economics API")
 
 # Include the routers, with a common prefix for each module
 app.include_router(tariffs.router, prefix="/api/v1/tariffs", tags=["Tariffs"])
