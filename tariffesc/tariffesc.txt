@@ -11,6 +11,8 @@ https://ttd.wto.org/en
 
 Stack: 
 - RestApi
+- pydanticc / logfire 
+- 
 
 Datapoints 
 - 
