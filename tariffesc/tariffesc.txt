@@ -11,10 +11,13 @@ https://ttd.wto.org/en
 
 Stack: 
 - RestApi
-- pydanticc / logfire 
+- pydantic / logfire 
 - 
 
 Datapoints 
+- Trade Openness
+- trade connections 
+- Best fit partner 
 - 
 
 
