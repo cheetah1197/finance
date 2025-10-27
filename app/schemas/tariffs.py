@@ -1,18 +1,20 @@
 # app/schemas/tariffs.py
-from pydantic import BaseModel
 from typing import Optional
+from sqlmodel import Field, SQLModel # Import Field and SQLModel
+from sqlalchemy import UniqueConstraint
 
-# Schema for input (e.g., when creating or updating a tariff record)
-class TariffBase(BaseModel):
-    country_code: str
-    product_code: str
+# Model for the database table
+class Tariff(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    
+    # Foreign Key to the Country table
+    country_id: int = Field(foreign_key="country.id", index=True) 
+    
+    product_code: str = Field(index=True)
     import_duty_rate: float
-
-# Schema for full response (includes an ID, for example)
-class Tariff(TariffBase):
-    id: int
-    description: Optional[str] = None # Optional field
-
-    class Config:
-        # This tells Pydantic to support ORM objects if you use SQLAlchemy later
-        orm_mode = True
+    
+    # Add a UNIQUE constraint on the combination of columns: 
+    # A country should only have ONE rate for a specific product code.
+    __table_args__ = (
+        UniqueConstraint("country_id", "product_code", name="uc_country_product"),
+    )
