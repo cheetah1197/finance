@@ -7,7 +7,7 @@ from sqlalchemy import UniqueConstraint # Need to import this for the __table_ar
 from app.db.database import get_session
 from app.schemas.economics import EconomicIndicator, EconomicIndicatorCreate, EconomicIndicatorRead
 
-router = APIRouter()
+router = APIRouter(tags=["Economics"])
 
 # GET all economic indicators
 @router.get("/", response_model=List[EconomicIndicatorRead])
