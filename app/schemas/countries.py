@@ -7,6 +7,8 @@ class Region(str, enum.Enum):
     EUROPE = "Europe"
     ASIA = "Asia"
     AMERICA = "America"
+    AFRICA = "Africa"
+    OCEANIA = "OCEANIA"
 
 # Model for the database table
 class Country(SQLModel, table=True):
