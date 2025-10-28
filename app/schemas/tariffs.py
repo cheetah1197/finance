@@ -1,9 +1,10 @@
+
 # app/schemas/tariffs.py
 from typing import Optional
-from sqlmodel import Field, SQLModel # Import Field and SQLModel
-from sqlalchemy import UniqueConstraint
+from sqlmodel import Field, SQLModel
+from sqlalchemy import UniqueConstraint # We fixed this import previously!
 
-# Model for the database table
+# 1. The Core ORM Model (Defines the DB table structure)
 class Tariff(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     
@@ -13,8 +14,22 @@ class Tariff(SQLModel, table=True):
     product_code: str = Field(index=True)
     import_duty_rate: float
     
-    # Add a UNIQUE constraint on the combination of columns: 
-    # A country should only have ONE rate for a specific product code.
     __table_args__ = (
         UniqueConstraint("country_id", "product_code", name="uc_country_product"),
     )
+
+# -----------------------------------------------------------------
+# 2. Pydantic Schemas for API Input and Output (ADD THESE TWO CLASSES)
+# -----------------------------------------------------------------
+
+# Schema for CREATING data (Client Input)
+# We exclude the 'id' because the client shouldn't provide it; the DB generates it.
+class TariffCreate(SQLModel):
+    country_id: int
+    product_code: str
+    import_duty_rate: float
+
+# Schema for READING data (API Output/Response)
+# This inherits ALL fields from Tariff, including the database-generated 'id'.
+class TariffRead(Tariff):
+    pass

@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.schemas.tariffs import Tariff 
 from app.schemas.countries import Country 
 from app.schemas.products import Product 
+from app.schemas.economics import EconomicIndicator
 
 # 1. Create the Async Engine
 # echo=True prints the SQL queries to the console, which is helpful for learning!
