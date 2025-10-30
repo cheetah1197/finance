@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Economic Data Explorer</title>
+    <style>
+        body { font-family: sans-serif; margin: 50px; }
+        h1 { color: #007bff; }
+        .data-link { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Economic Data Explorer</h1>
+    <p>Use the links below to view the data fetched from the World Bank.</p>
+    
+    <div class="data-link">
+        <h2>View Country Data (HTML):</h2>
+        <ul>
+            <li><a href="/api/v1/economics/country/US">United States (US) Data</a></li>
+            <li><a href="/api/v1/economics/country/DK">Denmark (DK) Data</a></li>
+            <li><a href="/api/v1/economics/country/DE">Germany (DE) Data</a></li>
+        </ul>
+    </div>
+    
+    <p style="margin-top: 50px;">You can also visit the <a href="/docs">FastAPI /docs</a> for the raw JSON endpoints.</p>
+</body>
+</html>

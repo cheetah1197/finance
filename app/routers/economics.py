@@ -1,5 +1,7 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession # Use AsyncSession for async db ops
 
@@ -8,6 +10,9 @@ from app.db.database import get_session
 from app.schemas.economics import EconomicIndicator, EconomicIndicatorCreate, EconomicIndicatorRead
 from app.schemas.countries import Country # <--- Assuming your Country model is here
 from app.schemas.api import CountryEconomicResponse, IndicatorDataPoint # <--- New API Schemas
+
+# Initialize templates here (or import from main if preferred, but initializing here is common)
+templates = Jinja2Templates(directory="app/templates")
 
 router = APIRouter(tags=["Economics"])
 
@@ -40,17 +45,18 @@ async def create_indicator(indicator_in: EconomicIndicatorCreate, session: Async
 # --- NEW ROUTE FOR COUNTRY-SPECIFIC DATA RETRIEVAL ---
 # --------------------------------------------------------------------------
 
-@router.get("/country/{country_code}", response_model=CountryEconomicResponse)
-async def get_country_data(
+@router.get("/country/{country_code}", response_class=HTMLResponse)
+async def get_country_data_html( # Renamed to avoid collision with the JSON route, if you keep both
+    request: Request, # <-- REQUIRED: Used by Jinja2 to render the template
     country_code: str, 
-    session: AsyncSession = Depends(get_session) # Use AsyncSession
+    session: AsyncSession = Depends(get_session)
 ):
     """
-    Retrieves all economic indicator data for a specific country code.
+    Retrieves and displays economic indicator data for a specific country in HTML.
     """
     code_upper = country_code.upper()
     
-    # 1. Find the Country Record
+    # 1. Fetch Country and Indicator Data (same logic as before)
     country_stmt = select(Country).where(Country.code == code_upper)
     country_result = await session.exec(country_stmt)
     country = country_result.first()
@@ -58,24 +64,16 @@ async def get_country_data(
     if not country:
         raise HTTPException(status_code=404, detail=f"Country '{country_code}' not found.")
 
-    # 2. Fetch all Economic Indicators for that Country ID
     indicator_stmt = select(EconomicIndicator).where(EconomicIndicator.country_id == country.id)
     indicator_result = await session.exec(indicator_stmt)
-    indicators = indicator_result.all()
+    indicators = indicator_result.all() # <-- This contains the list of all data points
     
-    # 3. Format the data for the API response model
-    data_points = [
-        IndicatorDataPoint(
-            indicator_code=ind.indicator_code,
-            date=ind.date,
-            value=ind.value
-        )
-        for ind in indicators
-    ]
-
-    # 4. Return the structured response
-    return CountryEconomicResponse(
-        country_code=country.code,
-        country_name=country.name,
-        data=data_points
+    # 2. Render the HTML template
+    return templates.TemplateResponse( # <-- USED: The Jinja2 object called to render the template
+        "country_data.html", 
+        {
+            "request": request,             # Pass the Request object
+            "country": country,             # Pass the Country SQLModel object
+            "data": indicators              # Pass the list of EconomicIndicator objects
+        }
     )
