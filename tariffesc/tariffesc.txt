@@ -14,11 +14,6 @@ Stack:
 - pydantic / logfire 
 - 
 
-Datapoints 
-- Trade Openness
-- trade connections 
-- Best fit partner 
-- 
 
 Economics functions: 
 - real gdp growth 
@@ -27,6 +22,8 @@ Economics functions:
 - privat investions 
 - employment 
 - 
+
+tariff functions: 
 
 
 UI/UX: 
