@@ -6,7 +6,7 @@ from sqlmodel import Session, select
 from app.db.database import engine
 from app.schemas.countries import Country
 from app.schemas.tariffs import TariffCreate
-from app.schemas.economics import EconomicIndicatorCreate
+from app.schemas.economics import EconomicIndicatorCreate, EconomicIndicator
 from datetime import date
 from typing import List
 
@@ -123,13 +123,12 @@ async def fetch_worldbank_data(client: httpx.AsyncClient, country_code: str, ind
             
     return all_records
 
-# OLD: async def load_all_economic_data():
-async def load_all_economic_data(session: AsyncSession): # <-- Take session as argument
+async def load_all_economic_data(session: AsyncSession):
     """Top-level function to orchestrate the World Bank data load."""
     print("--- Starting World Bank Economic Data Load ---")
 
     # Get country codes first
-    country_codes_result = await session.exec(select(Country.code)) # <-- Use passed session
+    country_codes_result = await session.exec(select(Country.code))
     country_codes = country_codes_result.all()
 
     DATE_RANGE = "2020:2024" 
@@ -141,7 +140,7 @@ async def load_all_economic_data(session: AsyncSession): # <-- Take session as a
             for indicator_name, indicator_id in TARGET_INDICATORS.items():
                 task = _process_and_insert_indicator(
                     client=client, 
-                    session=session, # <-- Pass the session down
+                    session=session, # Pass the session down
                     country_code=country_code, 
                     indicator_id=indicator_id, 
                     indicator_name=indicator_name, 
@@ -149,8 +148,14 @@ async def load_all_economic_data(session: AsyncSession): # <-- Take session as a
                 )
                 tasks.append(task)
 
+        # 1. Wait for all concurrent API calls and session.add() operations to finish
         await asyncio.gather(*tasks)
 
+        # 2. COMMIT ALL CHANGES AT ONCE
+        # This is the single, required commit for the entire concurrent operation.
+        await session.commit()
+        # Ensure you also REMOVED 'await session.commit()' from the worker function _process_and_insert_indicator
+        
     print("--- World Bank economic data load FINISHED ---")
 
 async def _process_and_insert_indicator(client: httpx.AsyncClient, session: AsyncSession, country_code: str, indicator_id: str, indicator_name: str, date_range: str):
@@ -177,24 +182,27 @@ async def _process_and_insert_indicator(client: httpx.AsyncClient, session: Asyn
 
         try:
             # Transform the API date string ('YYYY') into a Python date object
-            # Note: Since World Bank data is often annual, we use Jan 1st for the year.
             data_date = date(int(date_str), 1, 1) 
             
-            # Create the schema object
+            # 1. Create the Pydantic-based object (EconomicIndicatorCreate)
             indicator_create = EconomicIndicatorCreate(
                 country_id=country.id,
-                indicator_code=indicator_id, # Use the formal WB ID as your code
+                indicator_code=indicator_id,
                 date=data_date,
                 value=float(value)
             )
             
-            session.add(indicator_create)
-            inserted_count += 1
+            # 2. Convert to the MAPPED database model (EconomicIndicator)
+            #    This is the crucial step to resolve the "is not mapped" error.
+            indicator_db = EconomicIndicator(**indicator_create.model_dump())
             
+            # 3. Add the MAPPED model instance to the session
+            session.add(indicator_db)
+            inserted_count += 1
+        
         except Exception as e:
             # Handle parsing errors, like date conversion failure
             print(f"Skipping data point for {country_code} ({indicator_id}) on {date_str}: {e}")
             
-    await session.commit()
     print(f"Inserted {inserted_count} records for {country_code} ({indicator_name})")
 

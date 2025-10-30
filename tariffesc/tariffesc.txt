@@ -20,6 +20,9 @@ Datapoints
 - Best fit partner 
 - 
 
+Economics functions: 
+- 
+
 
 UI/UX: 
 - Interactive Worldmap 
