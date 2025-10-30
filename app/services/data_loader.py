@@ -1,6 +1,7 @@
 # app/services/data_loader.py
 import httpx
 import asyncio
+from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import Session, select
 from app.db.database import engine
 from app.schemas.countries import Country
@@ -122,39 +123,37 @@ async def fetch_worldbank_data(client: httpx.AsyncClient, country_code: str, ind
             
     return all_records
 
-async def load_all_economic_data():
-    """Top-level function to orchestrate the World Bank data load with full session handling."""
+# OLD: async def load_all_economic_data():
+async def load_all_economic_data(session: AsyncSession): # <-- Take session as argument
+    """Top-level function to orchestrate the World Bank data load."""
     print("--- Starting World Bank Economic Data Load ---")
 
-    async with engine.begin() as conn:
-        # Get country codes first (outside the main session loop for efficiency)
-        country_codes_result = await conn.execute(select(Country.code))
-        country_codes = country_codes_result.scalars().all()
-        
-        DATE_RANGE = "2020:2024" 
-        tasks = []
-        
-        # Start a single session for all the concurrent insertions
-        async with Session(conn) as session:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                for country_code in country_codes:
-                    for indicator_name, indicator_id in TARGET_INDICATORS.items():
-                        task = _process_and_insert_indicator(
-                            client=client, 
-                            session=session, 
-                            country_code=country_code, 
-                            indicator_id=indicator_id, 
-                            indicator_name=indicator_name, 
-                            date_range=DATE_RANGE
-                        )
-                        tasks.append(task)
+    # Get country codes first
+    country_codes_result = await session.exec(select(Country.code)) # <-- Use passed session
+    country_codes = country_codes_result.all()
 
-                # Run all indicator fetches and processing concurrently
-                await asyncio.gather(*tasks)
-                
+    DATE_RANGE = "2020:2024" 
+    tasks = []
+
+    # Session is now passed in, so we can use it directly
+    async with httpx.AsyncClient(timeout=30.0) as client: 
+        for country_code in country_codes:
+            for indicator_name, indicator_id in TARGET_INDICATORS.items():
+                task = _process_and_insert_indicator(
+                    client=client, 
+                    session=session, # <-- Pass the session down
+                    country_code=country_code, 
+                    indicator_id=indicator_id, 
+                    indicator_name=indicator_name, 
+                    date_range=DATE_RANGE
+                )
+                tasks.append(task)
+
+        await asyncio.gather(*tasks)
+
     print("--- World Bank economic data load FINISHED ---")
 
-async def _process_and_insert_indicator(client, session, country_code, indicator_id, indicator_name, date_range):
+async def _process_and_insert_indicator(client: httpx.AsyncClient, session: AsyncSession, country_code: str, indicator_id: str, indicator_name: str, date_range: str):
     """Helper to fetch, transform, and insert data for one indicator/country pair."""
     
     raw_data = await fetch_worldbank_data(client, country_code, indicator_id, date_range)

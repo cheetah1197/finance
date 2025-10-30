@@ -1,20 +1,19 @@
 # run_data_load.py (Simplified)
 
 import asyncio
-# ONLY import the specific functions you need to run
-from app.services.data_loader import run_full_data_load, load_all_economic_data 
-# Note: You need to have either load_economic_indicators or load_all_economic_data 
-# defined in data_loader.py. We'll use load_all_economic_data here for simplicity.
+# ADD: from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel.ext.asyncio.session import AsyncSession 
+from app.services.data_loader import load_all_economic_data # Assuming this is the function name now
+from app.db.database import engine # You need the engine here to start the async context
 
 async def main():
-    """Main execution function to run the full data loading process."""
     print("--- Starting Full Data Load Execution ---")
     
-    # Run the Tariff Loader (if you want to run it too)
-    # await run_full_data_load() 
-    
-    # Run the Economic Indicator Loader
-    await load_all_economic_data() 
+    async with engine.begin() as conn: # This starts the async transaction context
+        # FIX IS HERE: Use AsyncSession, not Session
+        async with AsyncSession(conn) as session: 
+            # Pass the session object to the loader function
+            await load_all_economic_data(session) 
     
     print("--- Full Data Load Execution Complete ---")
 
