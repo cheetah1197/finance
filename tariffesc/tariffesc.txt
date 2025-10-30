@@ -21,6 +21,11 @@ Datapoints
 - 
 
 Economics functions: 
+- real gdp growth 
+- real cpi 
+- gdp per capita 
+- privat investions 
+- employment 
 - 
 
 
