@@ -177,7 +177,7 @@ async def retrieve_all_economic_data(session: AsyncSession):
     statement = select(EconomicIndicator).limit(10)
     
     result = await session.exec(statement)
-    all_data = result.scalars().all()
+    all_data = result.all()
 
     print(f"Total records retrieved (showing max 10): {len(all_data)}")
     
