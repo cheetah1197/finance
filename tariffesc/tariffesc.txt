@@ -21,6 +21,7 @@ Economics functions:
 - gdp per capita 
 - privat investions 
 - employment 
+- gps growth path (last 5-10 years) 
 - 
 
 tariff functions: 
