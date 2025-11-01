@@ -3,7 +3,10 @@ Todo:
 - transform indicator codes and values to user friendly ones 
 - newest data? 
 - design folder 
-- 
+- presentable in a way that there is a world map and above it, 
+are different boxes with (gpd, tariffs, etc.) and if you click it 
+the countries coulours shpuld change in a way based on the calculates values 
+of the indicators. (Keep in mind red and green weakness) 
 
 Data Compression: 
 - gdp growth path 
