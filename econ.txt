@@ -2,7 +2,8 @@
 Todo: 
 - transform indicator codes and values to user friendly ones 
 - newest data? 
-
+- design folder 
+- 
 
 Data Compression: 
 - gdp growth path 
