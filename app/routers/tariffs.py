@@ -79,7 +79,7 @@ async def update_tariff(
     
     # Apply updates from the input schema to the database object
     update_data = tariff_update.model_dump(exclude_unset=True)
-    db_tariff.sqlmodel_update(update_data)
+    db_tariff.sqlmodel_update(update_data) # sqlmodel_update seems not to be called
     
     session.add(db_tariff)
     await session.commit()
