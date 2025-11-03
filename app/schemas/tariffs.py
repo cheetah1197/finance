@@ -1,35 +1,39 @@
-
-# app/schemas/tariffs.py
 from typing import Optional
 from sqlmodel import Field, SQLModel
-from sqlalchemy import UniqueConstraint # We fixed this import previously!
+from sqlalchemy import UniqueConstraint
 
-# 1. The Core ORM Model (Defines the DB table structure)
 class Tariff(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     
-    # Foreign Key to the Country table
+    # Reporter Country (The country imposing the tariff)
     country_id: int = Field(foreign_key="country.id", index=True) 
     
-    product_code: str = Field(index=True)
-    import_duty_rate: float
+    product_code: str = Field(index=True) # HS 6-digit product code
+    
+    year: int 
+    
+    # 1. MFN Simple Average Rate (Applied to countries without a preferential agreement)
+    mfn_simple_average_rate: float
+    
+    # 2. Preferential Simple Average Rate (Applied to countries *with* a preferential agreement)
+    # Note: WITS aggregates various preferential rates into one "Preferential Simple Average" indicator.
+    pref_simple_average_rate: Optional[float] 
+    
+    # The Effective Applied Tariff is often the minimum of the two, but WITS also calculates this
+    # applied_simple_average_rate: Optional[float] 
     
     __table_args__ = (
-        UniqueConstraint("country_id", "product_code", name="uc_country_product"),
+        # The unique constraint ensures you only have one record for a given product by a country in a year.
+        UniqueConstraint("country_id", "product_code", "year", name="uc_country_product_year"),
     )
 
-# -----------------------------------------------------------------
-# 2. Pydantic Schemas for API Input and Output (ADD THESE TWO CLASSES)
-# -----------------------------------------------------------------
-
-# Schema for CREATING data (Client Input)
-# We exclude the 'id' because the client shouldn't provide it; the DB generates it.
 class TariffCreate(SQLModel):
     country_id: int
     product_code: str
-    import_duty_rate: float
-
+    year: int
+    mfn_simple_average_rate: float
+    pref_simple_average_rate: Optional[float]
+    
 # Schema for READING data (API Output/Response)
-# This inherits ALL fields from Tariff, including the database-generated 'id'.
 class TariffRead(Tariff):
     pass
