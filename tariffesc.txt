@@ -16,6 +16,8 @@ Stack:
 
 
 tariff functions: 
+- Higher/lower than global average 
+
 
 
 UI/UX: 

@@ -1,4 +1,4 @@
 1. Tariffs data source 
 2. Econ data presentation (Better floating points and naming conventions)
 3. Search bar for countries where a list with all datapoints is presented 
-4. 
+4. Free Trade visualisation 
