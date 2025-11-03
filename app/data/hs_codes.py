@@ -11,6 +11,12 @@ WITS_CODELIST_URL = "https://wits.worldbank.org/API/V1/SDMX/Codelist/WBG_WITS/CL
 # Define the output path relative to the script's location
 OUTPUT_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'hs_codes.py')
 
+# Define a dictionary containing the headers you want to send.
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+}
+
+
 def parse_wits_product_codelist(xml_data: str) -> List[str]:
     """
     Parses the WITS SDMX XML data using standard ElementTree to extract 6-digit HS codes.
@@ -82,14 +88,17 @@ ALL_HS_6_DIGIT_CODES: List[str] = {codes_dump}
 
 
 async def fetch_and_write_hs_codes():
-    """Main asynchronous function to fetch from API and write the file."""
-    print(f"Fetching HS product codelist from WITS API: {WITS_CODELIST_URL}")
+    # 1. The headers dictionary is defined here
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
     
-    # Using httpx for a simple GET request
     try:
+        # 2. We create an asynchronous client object
         async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.get(WITS_CODELIST_URL)
-            response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
+            # 3. The request is made using client.get(), and the headers are passed in!
+            response = await client.get(WITS_CODELIST_URL, headers=headers) # <-- THIS IS THE LINE!
+            response.raise_for_status()
             
             # The WITS metadata API returns XML by default
             hs_codes = parse_wits_product_codelist(response.text)
