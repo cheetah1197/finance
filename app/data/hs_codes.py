@@ -7,7 +7,7 @@ from typing import List
 from datetime import date
 
 # The WITS SDMX Codelist API endpoint for products
-WITS_CODELIST_URL = "http://wits.worldbank.org/API/V1/SDMX/Codelist/WBG_WITS/CL_TS_PRODUCTCODE_WITS"
+WITS_CODELIST_URL = "https://wits.worldbank.org/API/V1/SDMX/Codelist/WBG_WITS/CL_TS_PRODUCTCODE_WITS"
 # Define the output path relative to the script's location
 OUTPUT_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'hs_codes.py')
 
