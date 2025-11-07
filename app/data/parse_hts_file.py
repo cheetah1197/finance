@@ -4,7 +4,7 @@ from typing import List
 from datetime import date
 
 # CONFIGURATION: Update this if you downloaded a different file name
-INPUT_FILE_NAME = 'HTS_Data.json'
+INPUT_FILE_NAME = 'htsdata.json'
 INPUT_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', INPUT_FILE_NAME)
 OUTPUT_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'hs_codes.py')
 
