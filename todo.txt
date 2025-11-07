@@ -3,4 +3,5 @@
 3. Search bar for countries where a list with all datapoints is presented 
 4. Free Trade visualisation 
 
-- 403 error with hs code fetching
+- Store hs codes but no product names?
+- 
