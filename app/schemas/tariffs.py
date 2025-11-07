@@ -5,34 +5,37 @@ from sqlalchemy import UniqueConstraint
 class Tariff(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     
-    # Reporter Country (The country imposing the tariff)
+    # Reporter Country ID (Foreign Key to country.id)
     country_id: int = Field(foreign_key="country.id", index=True) 
     
-    product_code: str = Field(index=True) # HS 6-digit product code
+    # Product Code (Foreign Key to product.code, max_length for efficiency)
+    product_code: str = Field(foreign_key="product.code", index=True, max_length=6) 
     
     year: int 
     
-    # 1. MFN Simple Average Rate (Applied to countries without a preferential agreement)
-    mfn_simple_average_rate: float
+    # 1. MFN Simple Average Rate (WITS Indicator: PMF)
+    # Changed to Optional[float] to handle cases where MFN data is not available.
+    mfn_simple_average_rate: Optional[float] 
     
-    # 2. Preferential Simple Average Rate (Applied to countries *with* a preferential agreement)
-    # Note: WITS aggregates various preferential rates into one "Preferential Simple Average" indicator.
+    # 2. Preferential Simple Average Rate (WITS Indicator: PRFP)
     pref_simple_average_rate: Optional[float] 
     
-    # The Effective Applied Tariff is often the minimum of the two, but WITS also calculates this
-    # applied_simple_average_rate: Optional[float] 
+    # 3. Applied Simple Average Rate (WITS Indicator: ATF)
+    applied_simple_average_rate: Optional[float] 
     
     __table_args__ = (
-        # The unique constraint ensures you only have one record for a given product by a country in a year.
+        # Ensures unique entry per country, product, and year.
         UniqueConstraint("country_id", "product_code", "year", name="uc_country_product_year"),
+        {'extend_existing': True}
     )
 
 class TariffCreate(SQLModel):
     country_id: int
     product_code: str
     year: int
-    mfn_simple_average_rate: float
+    mfn_simple_average_rate: Optional[float]
     pref_simple_average_rate: Optional[float]
+    applied_simple_average_rate: Optional[float] # Added ATF to the creation schema
     
 # Schema for READING data (API Output/Response)
 class TariffRead(Tariff):
