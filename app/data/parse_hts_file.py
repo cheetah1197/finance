@@ -1,47 +1,54 @@
-import json
+import csv
 import os
+import re
+import json
 from typing import List
 from datetime import date
 
-# CONFIGURATION: Update this if you downloaded a different file name
-INPUT_FILE_NAME = 'htsdata.json'
+# CONFIGURATION: Ensure this matches the file you downloaded
+INPUT_FILE_NAME = 'htsdata.csv'
 INPUT_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', INPUT_FILE_NAME)
 OUTPUT_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'hs_codes.py')
 
-def extract_hs_codes_from_json(file_path: str) -> List[str]:
+def extract_hs_codes_from_csv(file_path: str) -> List[str]:
     """
-    Reads the HTS JSON file, extracts the 6-digit Harmonized System codes,
-    and returns a sorted, unique list.
+    Reads the HTS CSV file, extracts the code from the first column, 
+    and filters for the 6-digit Harmonized System codes.
     """
     print(f"Reading HTS data from: {file_path}")
     
     if not os.path.exists(file_path):
-        print(f"ERROR: Input file not found at {file_path}. Please check your file name and path.")
-        return []
-
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-    except json.JSONDecodeError:
-        print("ERROR: Failed to parse JSON. Is the file valid JSON?")
-        return []
-    except Exception as e:
-        print(f"An unexpected error occurred while reading the file: {e}")
+        print(f"ERROR: Input CSV file not found at {file_path}. Please check your file name and path.")
         return []
 
     hs_codes = set()
     
-    # The USITC JSON structure typically contains a list of tariff items.
-    for item in data:
-        # The HTS number is the key field we are interested in.
-        hts_number = str(item.get('htsNumber', '')).replace('.', '').strip()
-        
-        # We need the first 6 digits of the HTS code.
-        # HTS codes can be 10 digits (e.g., '0101210000').
-        if len(hts_number) >= 6 and hts_number.isdigit():
-            # Extract the 6-digit HS code (the international standard)
-            hs_6_digit_code = hts_number[:6]
-            hs_codes.add(hs_6_digit_code)
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            # Use csv.reader to handle standard CSV formatting
+            reader = csv.reader(f)
+            
+            # Skip the header row (assuming the first row is headers)
+            next(reader, None) 
+
+            for row in reader:
+                if not row:
+                    continue
+                
+                # The HS/HTS code is always in the first column (index 0)
+                raw_code = str(row[0]).strip()
+                
+                # Clean the code: remove all non-digit characters (like periods or dashes)
+                clean_code = re.sub(r'\D', '', raw_code)
+
+                # The international HS code is the first 6 digits
+                if len(clean_code) >= 6:
+                    hs_6_digit_code = clean_code[:6]
+                    hs_codes.add(hs_6_digit_code)
+
+    except Exception as e:
+        print(f"An unexpected error occurred while reading or parsing the file: {e}")
+        return []
 
     print(f"Found {len(hs_codes)} unique 6-digit HS codes.")
     return sorted(list(hs_codes))
@@ -70,7 +77,7 @@ ALL_HS_6_DIGIT_CODES: List[str] = {codes_dump}
 
 
 if __name__ == '__main__':
-    all_codes = extract_hs_codes_from_json(INPUT_FILE_PATH)
+    all_codes = extract_hs_codes_from_csv(INPUT_FILE_PATH)
     if all_codes:
         generate_hs_code_file(all_codes)
     else:
