@@ -1,7 +1,12 @@
-1. Tariffs data source 
-2. Econ data presentation (Better floating points and naming conventions)
-3. Search bar for countries where a list with all datapoints is presented 
-4. Free Trade visualisation 
+ 
+- Econ data presentation (Better floating points and naming conventions)
+- Search bar for countries where a list with all datapoints is presented 
+- Free Trade visualisation 
 
 - Store hs codes but no product names?
+- 
+
+
+Fragen: 
+- Upsert
 - 
