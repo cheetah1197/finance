@@ -2,8 +2,9 @@
 - Econ data presentation (Better floating points and naming conventions)
 - Search bar for countries where a list with all datapoints is presented 
 - Free Trade visualisation 
-
-- Store hs codes but no product names?
+- tariffs are only from the outgoing countries perspective? 
+- run tariff data ingestion pipeline?
+- pg admin
 - 
 
 
