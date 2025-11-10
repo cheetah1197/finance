@@ -4,7 +4,7 @@
 - Free Trade visualisation 
 - tariffs are only from the outgoing countries perspective? 
 - run tariff data ingestion pipeline?
-- 
+- WITS accoutn for api keys
 
 
 Fragen: 

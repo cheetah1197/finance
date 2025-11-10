@@ -19,7 +19,7 @@ from app.data.product_list import ALL_HS_PRODUCTS
 # --- Configuration and Helpers ---
 
 # WITS URL Format: {base}/{dataflow}/[INDICATOR]/[REPORTERS]/[PARTNERS]/[PRODUCT_CODES]/[TIME]
-WITS_BASE_URL = "http://wits.worldbank.org/API/V1/SDMX/GetData"
+WITS_BASE_URL = "https://wits.worldbank.org/API/V1/SDMX/GetData"
 TARIFF_DATAFLOW = "TRF_TariffFlows"
 
 # WITS Indicators and mapping to your database fields
@@ -32,10 +32,10 @@ INDICATOR_MAP: Dict[str, str] = {
 # --- Configuration for Batching and Time Frame ---
 # WITS data has a lag; 2022 is often the most complete recent year.
 # I'm using your defined range, but be aware 2024/2025 data is unlikely to exist yet.
-LATEST_YEAR = 2025 
-START_YEAR = LATEST_YEAR - 4 
+LATEST_YEAR = 2023 
+START_YEAR = LATEST_YEAR - 2 
 COUNTRY_BATCH_SIZE = 1      # WITS URL size limits are strict, 1 country at a time is safest
-HS_CODE_BATCH_SIZE = 100    # Maximum number of HS codes WITS API can handle in one request
+HS_CODE_BATCH_SIZE = 25    # Maximum number of HS codes WITS API can handle in one request
 
 # Global map for fast lookup of DB Country ID from WITS ISO Code
 COUNTRY_ID_MAP: Dict[str, int] = {} 
