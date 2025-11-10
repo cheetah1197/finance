@@ -1,40 +1,46 @@
 import asyncio
-# Importing the specific async components from SQLAlchemy
+import os
+import sys
+# FIX: create_async_engine is correctly imported from sqlalchemy.ext.asyncio
 from sqlalchemy.ext.asyncio import create_async_engine 
-from sqlmodel.ext.asyncio.session import AsyncSession 
+from sqlmodel.ext.asyncio.session import AsyncSession
+from typing import AsyncGenerator
 
-# Import the instantiated settings object for the DB URL
-from app.core.config import settings
+# Add project root to path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Import the core data ingestion logic
+# --- ASSUMED IMPORTS ---
+# You need to ensure these files exist and define the necessary constants/functions.
+from app.core.config import settings # Assuming settings.DATABASE_URL exists
 from app.services.fetch_wits_tariff_data import fetch_and_save_wits_tariffs
+# --- END ASSUMED IMPORTS ---
 
-async def run_tariff_ingestion():
-    """
-    Main function to execute the long-running WITS tariff data ingestion pipeline.
-    """
-    db_url = settings.DATABASE_URL
-    
-    if not db_url:
-        print("ERROR: DATABASE_URL not found in config. Cannot proceed with ingestion.")
-        return
+# --- TEMPLATE FOR ASYNC DB SETUP (Adjust based on your project) ---
+# NOTE: Replace 'postgresql+asyncpg' with your actual driver if different
+DATABASE_URL = settings.DATABASE_URL # e.g., "postgresql+asyncpg://user:pass@host/db"
+engine = create_async_engine(DATABASE_URL, echo=False) 
 
-    print("--- Starting WITS Tariff Data Ingestion Process ---")
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    """Provides a transactional session for the database."""
+    async with AsyncSession(engine) as session:
+        yield session
+
+# --- MAIN RUNNER ---
+
+async def main():
+    """Entry point for the data ingestion script."""
+    print("Initializing WITS Ingestion Pipeline...")
     
-    # 1. Create the asynchronous database engine
-    engine = create_async_engine(db_url, echo=False)
-    
-    try:
-        # 2. Open an AsyncSession context
-        async with AsyncSession(engine) as session:
-            # 3. Call the main fetching function
-            await fetch_and_save_wits_tariffs(session)
-            
-        print("\n--- WITS Tariff Ingestion finished successfully. ---")
-        
-    except Exception as e:
-        print(f"\nFATAL ERROR during ingestion: {e}")
+    # We yield the session once and run the service
+    async for session in get_session():
+        await fetch_and_save_wits_tariffs(session)
 
 if __name__ == "__main__":
-    # Execute this script using: python run_ingestion.py
-    asyncio.run(run_tariff_ingestion())
+    try:
+        # This will block until the ingestion is complete
+        asyncio.run(main())
+    except ImportError as e:
+        print(f"\n[CRITICAL ERROR] Could not import application modules. Check your project structure and paths: {e}")
+        print("Required files: core/config.py (with DATABASE_URL), app/services/wits_ingestion.py, etc.")
+    except Exception as e:
+        print(f"\n[CRITICAL RUNTIME ERROR] Failed to run ingestion: {e}")

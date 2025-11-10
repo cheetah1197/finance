@@ -1,15 +1,17 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict # Import SettingsConfigDict
 
-from pydantic_settings import BaseSettings
-
-class Settings(BaseSettings):
+class AppSettings(BaseSettings): # Renamed class to AppSettings for clarity
     PROJECT_NAME: str = "Tariffs & Economics API"
     
     # Database Connection String (PostgreSQL format: postgresql+asyncpg://user:password@host/dbname)
-    # Set this as an environment variable when running the app later!
     DATABASE_URL: str = "postgresql+asyncpg://postgres:models:25,IT@localhost/finance_db"
 
-    class Config:
+    # Use model_config instead of inner Config class for modern Pydantic
+    model_config = SettingsConfigDict(
         # Tells Pydantic to load environment variables from a .env file if present
-        env_file = ".env"
+        env_file = ".env", 
+        env_file_encoding = 'utf-8'
+    )
 
-settings = Settings()
+# CRITICAL STEP: Create the single, instantiated settings object that will be imported.
+settings = AppSettings()

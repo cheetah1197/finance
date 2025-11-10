@@ -7,6 +7,7 @@ from alembic import context
 
 import sys
 import os
+import re 
 from app.core.config import settings
 
 # Add your project root to the path so modules can be imported
@@ -68,9 +69,17 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # 1. Get the URL from the configuration
+    url = config.get_main_option("sqlalchemy.url")
+
+    # CRITICAL FIX: Strip the async driver (e.g., '+asyncpg') from the URL 
+    # to force synchronous connection for Alembic's inspection.
+    sync_url = re.sub(r"\+(\w+)", "", url, 1)
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
+        url=sync_url, # Use the corrected synchronous URL here
         poolclass=pool.NullPool,
     )
 
