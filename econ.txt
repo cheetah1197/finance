@@ -28,7 +28,8 @@ New
 - Edcuation score 
 - avg age and age expectation 
 - financial markets data 
-- 
+- City level income/price levels 
+
 
 UX/UI: 
 - Landing: World Map with a select box on top for different indicators 
@@ -39,10 +40,6 @@ UX/UI:
 
 Unclear: 
 - Pydantic model in schemas/economics; source for indicators 
-
-
-
-
 
 
 Data Compression: 
