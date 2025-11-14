@@ -1,4 +1,7 @@
 Todo: 
+
+!! Migrate to own project/domain!!
+
 - transform indicator codes and values to user friendly ones 
 - newest data? 
 - design folder 
@@ -22,13 +25,15 @@ New
 - trade by country/economic zones 
 - FTA'
 - Immigration by region 
+- Edcuation score 
+- avg age and age expectation 
+- financial markets data 
 - 
-
-
 
 UX/UI: 
 - Landing: World Map with a select box on top for different indicators 
-- 
+- Restrict access for free tiers 
+
 
 
 
