@@ -1,12 +1,44 @@
-
 Todo: 
 - transform indicator codes and values to user friendly ones 
 - newest data? 
 - design folder 
-- presentable in a way that there is a world map and above it, 
-are different boxes with (gpd, tariffs, etc.) and if you click it 
-the countries coulours shpuld change in a way based on the calculates values 
-of the indicators. (Keep in mind red and green weakness) 
+- Global Data? 
+
+Indicators: 
+
+- Real GDP Growth 
+- Nominal GDP 
+- Real GDP per capita 
+- Nominal GDP per capita 
+- Private Invest 
+- Employment ratio 
+- CPI inflation 
+New
+- youth unemployment 
+- demographic perspective 
+- rent/income ratio 
+- consumption 
+- trade balance 
+- trade by country/economic zones 
+- FTA'
+- Immigration by region 
+- 
+
+
+
+UX/UI: 
+- Landing: World Map with a select box on top for different indicators 
+- 
+
+
+
+Unclear: 
+- Pydantic model in schemas/economics; source for indicators 
+
+
+
+
+
 
 Data Compression: 
 - gdp growth path 
