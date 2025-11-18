@@ -1,6 +1,4 @@
-Todo: 
 
-!! Migrate to own project/domain!!
 
 - transform indicator codes and values to user friendly ones 
 - newest data? 
