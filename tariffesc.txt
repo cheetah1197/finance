@@ -9,21 +9,3 @@ https://dataweb.usitc.gov/
 https://www.wto-ilibrary.org/content/series/25193147
 https://ttd.wto.org/en
 
-Stack: 
-- RestApi
-- pydantic / logfire 
-- 
-
-
-tariff functions: 
-- Higher/lower than global average 
-
-
-
-UI/UX: 
-- Interactive Worldmap 
-- 
-
-
-DB:
-- 
