@@ -8,6 +8,7 @@ MetricMinder is a Python-based web application designed to aggregate, process, a
 - **Automated Data Collection:** Scraping and cleaning economic data sources.
 - **Persistence:** Storing historical data in a structured PostgreSQL database.
 - **Visualization:** Rendering interactive charts for comparative economic analysis.
+- **Future Transition:** Decoupling Frontend to React.js for enhanced UX.
 
 ## 🛠 Tech Stack
 - **Backend:** Python 3.11+, FastAPI
