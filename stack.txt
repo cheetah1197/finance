@@ -1,0 +1,16 @@
+Frontend: 
+- React 
+Mapping/Vis: 
+- React-leaflet or react-simple-maps 
+- Dj3
+Styling: 
+- Tailwind css
+
+
+Backend/Api: 
+- Pydantic 
+- SQLmodel 
+- PostgreSQL 
+- FastAPI
+- alembic? 
+- 
