@@ -3,7 +3,7 @@
 - tariffs are only from the outgoing countries perspective? 
 - wits db does nott require any key but less then 50k requests 
 - .env file for database connection 
-- 
+- frontend repo 
 
 To learn: 
 - alembic
