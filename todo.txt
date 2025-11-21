@@ -5,6 +5,5 @@
 - .env file for database connection 
 - 
 
-Fragen: 
-- Upsert
+To learn: 
 - alembic
